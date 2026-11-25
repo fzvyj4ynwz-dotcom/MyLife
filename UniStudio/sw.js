@@ -1,5 +1,10 @@
-const CACHE='unistudio-ipad-v12-3';const FILES=['./','./index.html','./icon.svg','./manifest.webmanifest'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(a=>Promise.all(a.filter(k=>k.startsWith('unistudio-ipad-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith(new URL('./',self.location).pathname))return;e.respondWith(fetch(e.request).then(r=>{if(r.ok){const copy=r.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(e.request,copy)).catch(()=>{}))}return r}).catch(async()=>{const c=await caches.open(CACHE);return await c.match(e.request)||(e.request.mode==='navigate'?await c.match('./index.html'):Response.error())}))});
+const CACHE='unistudio-ipad-v12-4', BASE=new URL('./',self.location.href), INDEX=new URL('index.html',BASE).href;
+const FILES=['index.html','icon.svg','manifest.webmanifest'];
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);for(const f of FILES){const u=new URL(f,BASE);const r=await fetch(u.href,{cache:'no-store'});if(!r.ok)throw Error('Asset '+f+' unavailable');if(f==='index.html'){const html=await r.clone().text();if(!/<meta\s+name=["']unistudio-build["']\s+content=["']12\.4["']/.test(html))throw Error('Release not yet deployed')}await c.put(u.href,r)}await self.skipWaiting()})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();const names=await caches.keys();await Promise.all(names.filter(k=>k.startsWith('unistudio-ipad-')&&k!==CACHE).map(k=>caches.delete(k)))})()));
+self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==BASE.origin||!u.pathname.startsWith(BASE.pathname))return;
+ if(u.searchParams.has('__uni_check')){e.respondWith(fetch(e.request,{cache:'no-store'}));return}
+ const isPage=e.request.mode==='navigate'||u.pathname===BASE.pathname||u.pathname===new URL('index.html',BASE).pathname;
+ e.respondWith((async()=>{const c=await caches.open(CACHE);try{const r=await fetch(e.request,{cache:isPage?'no-store':'default'});if(r.ok){const copy=r.clone();await c.put(isPage?INDEX:e.request,copy).catch(()=>{})}else if(isPage&&r.status>=500){const old=await c.match(INDEX);if(old)return old}return r}catch(err){const old=await c.match(isPage?INDEX:e.request);return old||Response.error()}})())
+});
 self.addEventListener('notificationclick',e=>{e.notification.close();e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(a=>a.length?a[0].focus():clients.openWindow('./')))});
