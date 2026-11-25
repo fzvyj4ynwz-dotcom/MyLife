@@ -615,8 +615,8 @@ function put(k,v){const old=state[k];state[k]=v;try{localStorage.setItem(KEY,JSO
 const mins=t=>/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(t||'')?Number(t.slice(0,2))*60+Number(t.slice(3)):-1;
 const dayOK=d=>typeof d==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(d)&&localDate(atDate(d))===d;
 const overlap=(a,b,c,d)=>a<d&&c<b;
-const btn=(a,l,id='')=>'<button class="light-btn" data-u6="'+a+'" data-id="'+attr(id)+'">'+esc(l)+'</button>';
-const go=(p,l)=>'<button class="light-btn" data-page="'+p+'">'+esc(l)+'</button>';
+const btn=(a,l,id='')=>'<button type="button" class="light-btn" data-u6="'+a+'" data-id="'+attr(id)+'">'+esc(l)+'</button>';
+const go=(p,l)=>'<button type="button" class="light-btn" data-page="'+p+'">'+esc(l)+'</button>';
 const box6=(title,html,wide=false)=>'<section class="u6-card'+(wide?' u6-wide':'')+'"><h3>'+esc(title)+'</h3>'+html+'</section>';
 const formData=e=>Object.fromEntries(new FormData(e.target));
 const dayText=d=>atDate(d).toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
@@ -652,7 +652,7 @@ document.addEventListener('submit',e=>{const id=e.target.id;if(!['u6-block','u6-
 if(id==='u6-quiz')return startQuiz(Number(f.count)||10,!!f.weak);
 if(id==='u6-custom'){const a=new FormData(e.target).getAll('shortcut').filter(x=>tools6.some(t=>t[0]===x));if(a.length>10){toast('Scegli al massimo 10 scorciatoie.');return;}if(put('uiV6',{shortcuts:a,classic:!!f.classic}))navigate('home');return;}
 if(id==='u6-habit'){const title=String(f.title||'').trim();if(title&&put('habitsV6',[...habits(),{id:uid(),title,days:[]}]))render();return;}
-if(id==='u6-block'){const title=String(f.title||'').trim();if(!title||mins(f.start)<0||mins(f.end)<=mins(f.start)){toast('Inserisci un titolo e un orario di fine successivo all’inizio.');return;}const c=conflicts(selectedDay,f.start,f.end,editing);if(c.length&&!confirm('Possibile sovrapposizione con: '+c.map(x=>x.title).join(', ')+'. Salvare comunque?'))return;const old=blocks().find(x=>x.id===editing),x={id:old?.id||uid(),title,kind:Object.hasOwn(kinds,f.kind)?f.kind:'study',courseId:f.courseId||'',date:selectedDay,start:f.start,end:f.end,done:!!old?.done};if(put('blocksV6',[...blocks().filter(b=>b.id!==x.id),x])){editing='';render();toast('Blocco salvato');}}
+if(id==='u6-block'){const title=String(f.title||'').trim();if(!title||mins(f.start)<0||mins(f.end)<=mins(f.start)){toast('Inserisci un titolo e un orario di fine successivo all’inizio.');return;}const c=conflicts(selectedDay,f.start,f.end,editing);if(c.length&&!confirm('Possibile sovrapposizione con: '+c.map(x=>x.title).join(', ')+'. Salvare comunque?'))return;const old=blocks().find(x=>x.id===editing),x={id:old?.id||uid(),title,kind:Object.prototype.hasOwnProperty.call(kinds,f.kind)?f.kind:'study',courseId:f.courseId||'',date:selectedDay,start:f.start,end:f.end,done:!!old?.done};if(put('blocksV6',[...blocks().filter(b=>b.id!==x.id),x])){editing='';render();toast('Blocco salvato');}}
 });
 document.addEventListener('click',e=>{const b=e.target.closest('[data-u6]');if(!b)return;const k=b.dataset.u6,id=b.dataset.id;
 if(['day-prev','day-next','day-today'].includes(k)){selectedDay=k==='day-today'?today():localDate(plusDays(atDate(selectedDay),k==='day-prev'?-1:1));editing='';return render();}
