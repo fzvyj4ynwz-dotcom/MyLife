@@ -1,6 +1,6 @@
-const CACHE='unistudio-ipad-v12-5', BASE=new URL('./',self.location.href), INDEX=new URL('index.html',BASE).href;
+const CACHE='unistudio-ipad-v12-6', BASE=new URL('./',self.location.href), INDEX=new URL('index.html',BASE).href;
 const FILES=['index.html','icon.svg','manifest.webmanifest'];
-self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);for(const f of FILES){const u=new URL(f,BASE);const r=await fetch(u.href,{cache:'no-store'});if(!r.ok)throw Error('Asset '+f+' unavailable');if(f==='index.html'){const html=await r.clone().text();if(!/<meta\s+name=["']unistudio-build["']\s+content=["']12\.5["']/.test(html))throw Error('Release not yet deployed')}await c.put(u.href,r)}await self.skipWaiting()})()));
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);for(const f of FILES){const u=new URL(f,BASE);const r=await fetch(u.href,{cache:'no-store'});if(!r.ok)throw Error('Asset '+f+' unavailable');if(f==='index.html'){const html=await r.clone().text();if(!/<meta\s+name=["']unistudio-build["']\s+content=["']12\.6["']/.test(html))throw Error('Release not yet deployed')}await c.put(u.href,r)}await self.skipWaiting()})()));
 self.addEventListener('activate',e=>e.waitUntil((async()=>{await self.clients.claim();const names=await caches.keys();await Promise.all(names.filter(k=>k.startsWith('unistudio-ipad-')&&k!==CACHE).map(k=>caches.delete(k)))})()));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==BASE.origin||!u.pathname.startsWith(BASE.pathname))return;
  if(u.searchParams.has('__uni_check')){e.respondWith(fetch(e.request,{cache:'no-store'}));return}
