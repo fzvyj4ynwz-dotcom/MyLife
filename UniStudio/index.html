@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5fb">
-  <meta name="unistudio-build" content="15.0">
+  <meta name="unistudio-build" content="15.1">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="UniStudio">
@@ -96,6 +96,42 @@ html.x15-large #app :is(p,label,li,.x15-link,.x15-preview,.x15-widget p){font-si
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 html.x15-reduce *,html.x15-reduce *::before,html.x15-reduce *::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 @media print{.x15-context,.x15-top-search,.x15-focus-actions{display:none!important}}
+</style>
+<style id="home151-css">
+html[data-x15-page=home] .topbar #top-date,html[data-x15-page=home] .topbar .a17-description{display:none!important}
+html[data-x15-page=home] .topbar #page-title{font-size:clamp(17px,2vw,22px)!important;letter-spacing:-.03em!important}
+html[data-x15-page=home] .topbar .a17-heading>.a17-symbol{width:34px;height:34px;border-radius:10px}
+html[data-x15-page=home] .topbar .a17-heading>.a17-symbol svg{width:20px;height:20px}
+#app .x151-hero{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:clamp(20px,3.4vw,35px);margin-bottom:24px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 8%,var(--card)),var(--card) 80%);border-radius:25px}
+#app .x151-welcome{min-width:0}
+#app .x151-welcome h2{margin:0 0 8px!important;font-size:clamp(31px,4.2vw,48px);font-weight:750;letter-spacing:-.055em;overflow-wrap:anywhere}
+#app .x151-welcome p{margin:0;line-height:1.4;text-transform:none}
+#app .x151-hero .x15-hero-actions{justify-content:flex-end;align-items:center;flex:0 1 auto}
+#app .x151-hero .x15-hero-actions .x15-button:first-child{background:var(--card);color:var(--ink);border-color:var(--x15-line)}
+#app .x151-section-title{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+#app .x151-section-title h3{font-size:21px;margin:0;font-weight:700}
+#app .x151-section-title small{font-size:10px;color:var(--muted);letter-spacing:.06em}
+#app .x151-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;align-items:stretch}
+#app .x151-grid .x15-widget{grid-column:span 2;display:flex;flex-direction:column;gap:3px;padding:clamp(13px,1.8vw,21px)}
+#app .x151-grid .x15-widget.x15-wide{grid-column:span 3}
+#app .x151-grid.x151-default [data-x15-widget=recent]{grid-column:1/-1}
+#app .x151-grid .x15-widget>.x15-link:last-child{margin-top:auto}
+#app .x151-grid .x15-widget-head{margin-bottom:8px}
+#app .x151-grid .x15-widget>.x15-link:last-child,#app .x151-grid .x15-links .x15-link{border-bottom:0}
+#app .x151-grid .x15-widget[data-x15-widget=recent] .x15-links:empty{display:none}
+#app .x151-grid .x15-chart{margin:10px 0}
+#app .x151-grid .x15-track{height:76px}
+#app .x15-classic>summary{font-size:13px;color:var(--muted);box-shadow:none}
+#app[data-x15-page=home]{container-type:inline-size}
+@container (max-width:680px){
+#app .x151-hero{flex-direction:column;align-items:flex-start;gap:13px}
+#app .x151-hero .x15-hero-actions{justify-content:flex-start}
+#app .x151-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+#app .x151-grid .x15-widget{grid-column:span 1}
+#app .x151-grid .x15-widget.x15-wide,#app .x151-grid.x151-default [data-x15-widget=exam]{grid-column:1/-1}
+}
+@container (max-width:390px){#app .x151-grid{grid-template-columns:1fr;gap:10px}#app .x151-grid .x15-widget{grid-column:1/-1}#app .x151-section-title small{font-size:9px}}
+@supports not (container-type:inline-size){@media(max-width:1000px){#app .x151-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#app .x151-grid .x15-widget{grid-column:span 1}#app .x151-grid .x15-widget.x15-wide,#app .x151-grid.x151-default [data-x15-widget=exam]{grid-column:1/-1}#app .x151-hero{flex-direction:column;align-items:flex-start}}@media(max-width:480px){#app .x151-grid{grid-template-columns:1fr}#app .x151-grid .x15-widget{grid-column:1/-1}}}
 </style>
 </head>
 <body>
@@ -1461,7 +1497,7 @@ if(a==='pod-play')return speak(podText);if(a==='pod-stop')return window.speechSy
  RENDERS.c13growth=()=>{const st=stats();return h('Il tuo percorso','Traguardi personali, senza classifiche né penalità.')+box('Livello '+(1+Math.floor(st.points/50)),'<progress max="50" value="'+st.points%50+'"></progress><p>'+st.points+' punti · '+st.mins+' minuti · '+st.reviewed+' valutazioni</p>')+box('Traguardi',[['Prima sessione',st.mins>=15],['Cinque ore di studio',st.mins>=300],['Dieci ripassi',st.reviewed>=10],['Primo esame superato',st.completed>=1],['Dieci esami superati',st.completed>=10]].map(([x,ok])=>'<div class="c13-item"><strong>'+esc(x)+'</strong><span>'+ (ok?'✓ Raggiunto':'Da raggiungere')+'</span></div>').join(''))+box('Modalità coppia · dediche private',field('Da',input('c13-from','Alessandro'))+field('Messaggio',textArea('c13-message','','Scrivi una dedica…'))+row(btn('message','Salva dedica','','primary-btn'))+(data().messages||[]).map(m=>'<div class="c13-item"><strong>'+esc(m.from)+'</strong><span>'+esc(m.text)+'</span>'+btn('delete-message','Rimuovi',m.id)+'</div>').join('')+'<p>Le dediche restano sul dispositivo, non vengono inviate da remoto.</p>')};TITLES.c13growth='Percorso personale';
  RENDERS.c13storage=()=>h('Centro sicurezza','Controlla lo spazio e prepara copie dei materiali. I dati restano locali; lo spazio non è illimitato.')+box('Archivio del dispositivo','<p id="c13-storage">'+esc(storageText)+'</p>'+row(btn('storage','Misura spazio')+btn('persist','Richiedi protezione archivio'))+'<p>Il browser può comunque rimuovere i dati. Conserva backup separati.</p>')+box('Copie e trasferimento',row(go('archive12','Archivio sicuro')+go('settings','Backup impostazioni')+go('library8','Backup libri')+go('documents10','Documenti'))+'<p>Ultimo promemoria personale: '+esc(data().lastBackup||'Mai registrato')+'</p>'+btn('backup-mark','Ho verificato le mie copie')+'<p>iCloud Drive può conservare manualmente i file esportati; non è una sincronizzazione automatica.</p>')+box('Integrazioni','<p>Calendario: esportazione ICS dal planner. Tutor: servizio HTTPS da configurare nella sezione Assistente. Widget nativi, Face ID, Siri e Apple Watch richiedono una app nativa.</p>'+row(go('ai','Configura tutor')+go('day6','Calendario')));TITLES.c13storage='Centro sicurezza';
  const style=document.createElement('style');style.textContent='.c13-hero{padding:25px;border-radius:25px;background:linear-gradient(125deg,#2354af,#5681ce);color:#fff;margin:0 0 16px;overflow:hidden}.c13-hero small{font-size:10px;letter-spacing:.12em;font-weight:700}.c13-hero h2{font-size:clamp(25px,4vw,38px);letter-spacing:-.045em;margin:8px 0}.c13-hero p{color:#fff;max-width:65ch;line-height:1.5;margin:0}.c13-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px;margin:14px 0}.c13-card{padding:19px;background:var(--card);border:1px solid var(--border);border-radius:22px;min-width:0;margin-bottom:12px;overflow-wrap:anywhere}.c13-card h3{font-size:19px;letter-spacing:-.035em;margin:0 0 12px}.c13-card p{line-height:1.55}.c13-grid>.c13-card{margin:0}.c13-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0}.c13-row button{min-height:44px}.c13-field{display:grid;gap:7px;margin:12px 0;font-weight:600;font-size:13px}.c13-field :is(input,select,textarea){font:inherit;font-size:16px;font-weight:400;min-height:44px;border:1px solid var(--border);border-radius:12px;background:var(--bg);color:var(--ink);padding:11px;width:100%;min-width:0}.c13-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px}.c13-metrics>div{border:1px solid var(--border);background:var(--card);padding:15px;border-radius:18px}.c13-metrics span{display:block;font-size:12px;opacity:.78}.c13-metrics strong{font-size:30px;display:block;margin-top:6px;letter-spacing:-.04em}.c13-item{padding:12px 0;border-bottom:1px solid var(--border);display:grid;gap:6px}.c13-item span{font-size:13px;opacity:.78}.c13-item button{justify-self:start}.c13-preview{white-space:pre-wrap;line-height:1.6;max-height:360px;overflow:auto;padding:12px;background:var(--bg);border-radius:13px}.c13-flash{background:var(--bg);border-radius:20px;padding:25px;margin:12px 0;white-space:pre-wrap;font-size:21px;line-height:1.5}.c13-card progress{width:100%;accent-color:var(--accent)}#c13-scan{width:100%;max-height:65vh;object-fit:contain;border-radius:12px}.c13-card blockquote{border-left:3px solid var(--accent);padding-left:12px;margin:10px 0;white-space:pre-wrap}.c13-hub{margin-bottom:15px}.c13-quick{display:flex;gap:8px;flex-wrap:wrap}.c13-quick button{min-height:44px}.c13-paper-extra{display:flex;gap:8px;flex-wrap:wrap;padding:8px 0}.c13-paper-extra button{min-height:40px}.c13-paper-extra[hidden]{display:none!important}@media(max-width:740px){.c13-hero{padding:19px}.c13-card{padding:15px}}@media print{.c13-paper-extra,.c13-hub{display:none!important}}';document.head.append(style);
- const nav=$('#nav');const first=nav?.querySelector('.u14-group-items');if(first){const link=document.createElement('button');link.type='button';link.className='nav-item';link.dataset.page='c13home';const sample=nav.querySelector('[data-page="ai"] .u15-navicon');const ico=sample?sample.cloneNode(true):document.createElement('span');ico.classList.add('nav-ico');if(!sample)ico.textContent='✧';link.append(ico,document.createTextNode(' Campus Intelligence'));first.prepend(link)}
+ const nav=$('#nav');const first=nav?.querySelector('.u14-group-items');if(first){const link=document.createElement('button');link.type='button';link.className='nav-item';link.dataset.page='c13home';const sample=nav.querySelector('[data-page="ai"] .u15-navicon');const ico=sample?sample.cloneNode(true):document.createElement('span');ico.classList.add('nav-ico');if(!sample)ico.textContent='✧';link.append(ico,document.createTextNode(' Campus Intelligence'));const overview=first.querySelector('[data-page="home"]');if(overview)overview.after(link);else first.prepend(link)}
  const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card c13-hub"><small>UNISTUDIO 13 · CAMPUS INTELLIGENCE</small><h3>Il tuo campus, più intelligente</h3><div class="c13-quick">'+go('c13home','Campus Intelligence')+go('c13plan','Pilota automatico')+go('c13memory','Ripasso')+go('c13desk','Scrivania Pro')+'</div></section>'+home();
  const more=RENDERS.more;RENDERS.more=()=>box('Campus Intelligence',row(go('c13home','Campus')+go('c13plan','Pilota automatico')+go('c13memory','Memoria')+go('c13library','Biblioteca intelligente')+go('c13desk','Scrivania Pro')+go('c13growth','Percorso e dediche')+go('c13storage','Sicurezza')))+more();
  const settings=RENDERS.settings;RENDERS.settings=()=>box('Campus Intelligence',row(go('c13storage','Centro sicurezza')+go('c13growth','Dediche e traguardi')))+settings();
@@ -1551,7 +1587,7 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
 (function experience15(){
   const app=document.getElementById('app'), root=document.documentElement;
   const key='unistudio_experience15';
-  const defs={order:['today','tasks','exam','week','tools','recent'],hidden:[],wide:['week','tools'],motion:true,large:false,contrast:false,texture:'paper',haptic:true,classic:false,recent:[]};
+  const defs={order:['today','tasks','exam','week','tools','recent'],hidden:[],wide:['week','tools','recent'],motion:true,large:false,contrast:false,texture:'paper',haptic:true,classic:false,recent:[]};
   let p={...defs};try{const v=JSON.parse(localStorage.getItem(key)||'{}');if(v&&typeof v==='object')p={...defs,...v}}catch{}
   const ids=defs.order;
   for(const k of ['order','hidden','wide'])p[k]=Array.isArray(p[k])?[...new Set(p[k].filter(x=>ids.includes(x)))]:[...defs[k]];
@@ -1559,6 +1595,9 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
   p.recent=Array.isArray(p.recent)?p.recent.filter(x=>typeof x==='string').slice(0,6):[];
   if(!['paper','clean','warm'].includes(p.texture))p.texture='paper';
   function store(){try{localStorage.setItem(key,JSON.stringify(p));return true}catch{toast('Preferenze non salvate: verifica lo spazio disponibile.');return false}}
+  // Reorder this dashboard once; retain hidden widgets, other preferences and all study data.
+  if(p.layoutRevision!==151){p.order=[...defs.order];p.wide=[...defs.wide];p.classic=false;p.layoutRevision=151;store()}
+  const greeting=()=>{const h=new Date().getHours();const name=String(state.profileV2?.name||'Sara').trim().split(/\s+/)[0]||'Sara';return (h<12?'Buongiorno':h<18?'Buon pomeriggio':'Buonasera')+' '+name};
   const labels={today:'Oggi',tasks:'Promemoria',exam:'Prossimo esame',week:'Andamento settimanale',tools:'Strumenti preferiti',recent:'Aperti di recente'};
   const symbols={today:'calendar',tasks:'tasks',exam:'exam',week:'chart',tools:'grid',recent:'clock',search:'search',settings:'settings',focus:'focus'};
   const paths={calendar:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5h3"/>',tasks:'<circle cx="5" cy="6" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="5" cy="18" r="2"/><path d="M10 6h11m-11 6h11m-11 6h11"/>',exam:'<path d="m12 3 3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/>',chart:'<path d="M4 19V9m5 10V5m6 14v-7m5 7V3"/>',grid:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/>',search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/>',settings:'<path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--card)"/><circle cx="15" cy="12" r="2" fill="var(--card)"/><circle cx="8" cy="17" r="2" fill="var(--card)"/>',focus:'<path d="M9 3H3v6m12-6h6v6M3 15v6h6m12-6v6h-6"/><circle cx="12" cy="12" r="3"/>'};
@@ -1577,11 +1616,11 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
     if(k==='exam')body=next?'<div class="x15-big x15-exam">'+esc(next.title)+'</div><p>'+esc(next.date)+'</p>'+go('exams','Apri esami'):'<p>Nessun esame programmato.</p>'+go('exams','Organizza esami');
     if(k==='week'){const w=week(), max=Math.max(1,...w.map(x=>mins(x.date)));body='<div class="x15-big">'+w.reduce((a,x)=>a+mins(x.date),0)+'<small> min negli ultimi 7 giorni</small></div><div class="x15-chart">'+w.map(x=>'<div><span>'+mins(x.date)+'</span><div class="x15-track"><i style="height:'+Math.max(0,Math.min(100,mins(x.date)/max*100))+'%"></i></div><small>'+esc(x.label)+'</small></div>').join('')+'</div>'+go('journal9','Diario di studio')}
     if(k==='tools')body='<div class="x15-links">'+tools().map(x=>go(x)).join('')+'</div>'+go('custom6','Modifica preferiti');
-    if(k==='recent')body=p.recent.filter(x=>RENDERS[x]).map(x=>go(x)).join('')||'<p>Gli strumenti che apri appariranno qui.</p>';
+    if(k==='recent')body=p.recent.some(x=>RENDERS[x])?'<div class="x15-links">'+p.recent.filter(x=>RENDERS[x]).map(x=>go(x)).join('')+'</div>':'<p>Gli strumenti che apri appariranno qui.</p>';
     return '<section class="x15-widget '+(p.wide.includes(k)?'x15-wide':'')+'" data-x15-widget="'+k+'"><div class="x15-widget-head"><span class="x15-symbol">'+icon(symbols[k])+'</span><h3>'+labels[k]+'</h3></div>'+body+'</section>';
   }
   const previousHome=RENDERS.home;
-  RENDERS.home=()=>'<section class="x15-hero"><small>UNISTUDIO 15.0 · APPLE EXPERIENCE</small><h2>Il tuo spazio, il tuo ritmo.</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+' · Organizza la tua giornata.</p><div class="x15-hero-actions">'+button('spotlight','Cerca in UniStudio')+button('configure','Personalizza Home')+'</div></section><div class="x15-grid">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div><details class="x15-classic" '+(p.classic?'open':'')+'><summary>Altri strumenti e panoramica completa</summary>'+previousHome()+'</details>';
+  RENDERS.home=()=>'<section class="x15-hero x151-hero"><div class="x151-welcome"><h2>'+esc(greeting())+'</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+' · Il tuo spazio di studio</p></div><div class="x15-hero-actions">'+button('spotlight','Cerca')+button('configure','Personalizza Home')+'</div></section><div class="x151-section-title"><h3>La tua giornata</h3><small>UNISTUDIO 15.1 · APPLE EXPERIENCE</small></div><div class="x15-grid x151-grid '+(p.order.join(',')===defs.order.join(',')&&p.wide.join(',')===defs.wide.join(',')&&!p.hidden.length?'x151-default':'')+'">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div><details class="x15-classic" '+(p.classic?'open':'')+'><summary>Altri strumenti e panoramica completa</summary>'+previousHome()+'</details>';
   function settings(){return '<section class="setting-card x15-settings"><div class="eyebrow">APPLE EXPERIENCE</div><h3>Aspetto e accessibilità</h3><p>Personalizza l’esperienza senza modificare i dati di studio.</p>'+[['motion','Animazioni'],['large','Testo più grande'],['contrast','Contrasto elevato'],['haptic','Feedback tattile (se supportato)']].map(([k,l])=>'<label><input type="checkbox" data-x15-pref="'+k+'" '+(p[k]?'checked':'')+'> '+l+'</label>').join('')+'<label>Superficie dei quaderni <select data-x15-pref="texture">'+[['paper','Carta delicata'],['clean','Bianca'],['warm','Carta avorio']].map(([k,l])=>'<option value="'+k+'" '+(p.texture===k?'selected':'')+'>'+l+'</option>').join('')+'</select></label>'+button('configure','Organizza widget Home')+'</section>'}
   const settings0=RENDERS.settings;RENDERS.settings=()=>settings()+settings0();
   const focus0=RENDERS.focus;RENDERS.focus=()=>'<div class="x15-focus-actions">'+button('immerse','Modalità immersiva')+'</div>'+focus0();
