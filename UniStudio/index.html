@@ -1266,7 +1266,7 @@ if(a==='pod-play')return speak(podText);if(a==='pod-stop')return window.speechSy
  RENDERS.tasks=()=>{
  const day=today(),all=[...state.tasks].sort((a,b)=>sortDateTime(a,b)),counts={today:0,late:0,next:0,nodate:0,done:0,all:all.length};
  for(const t of all)counts[taskGroup(t,day)]++;
- const filters=[['all','Tutti','task',all.length],['today','Oggi','calendar',counts.today],['late','In ritardo','flag',counts.late],['next','In programma','clock',counts.next],['done','Completati','check',counts.done]];
+ const filters=[['all','Tutti','task',all.length],['today','Oggi','calendar',counts.today],['late','In ritardo','flag',counts.late],['next','In programma','clock',counts.next+counts.nodate],['done','Completati','check',counts.done]];
  const cards='<div class="s16-task-tiles">'+filters.map(([k,l,i,n])=>'<button type="button" data-s16-task="'+k+'" class="s16-task-tile" aria-pressed="'+(taskView===k)+'">'+svg(i)+'<strong>'+n+'</strong><span>'+l+'</span></button>').join('')+'</div>';
  const row=t=>'<article class="s16-task-row"><button type="button" class="s16-check '+(t.done?'s16-checked':'')+'" data-action="toggle-task" data-id="'+attr(t.id)+'" aria-label="'+(t.done?'Riattiva':'Completa')+' promemoria">'+(t.done?svg('check'):'')+'</button><div class="s16-grow"><strong class="'+(t.done?'s16-struck':'')+'">'+esc(t.title)+'</strong><div class="s16-detail">'+(t.priority==='high'?'<span class="s16-flag">'+svg('flag')+' Priorità alta</span>':'')+'<span>'+esc(courseName(t.courseId))+'</span>'+(t.date?'<span>'+esc(fmtDate(t.date))+(t.time?' · '+esc(t.time):'')+'</span>':'')+'</div>'+(t.description?'<p>'+esc(t.description)+'</p>':'')+'</div><div class="s16-actions">'+action('edit-task',t.id,'edit','Modifica')+action('delete-task',t.id,'trash','Elimina',true)+'</div></article>';
  const names={today:'Oggi',late:'Scaduti',next:'In programma',nodate:'Senza scadenza',done:'Completati'};
@@ -1320,7 +1320,7 @@ if(a==='pod-play')return speak(podText);if(a==='pod-stop')return window.speechSy
  async function check(force=false){
  if(checking||document.hidden||!navigator.onLine)return;if(!force&&Date.now()-lastCheck<20000){apply();return}checking=true;lastCheck=Date.now();note('Ricerca aggiornamenti…');
  try{
- if('serviceWorker'in navigator&&location.protocol==='https:'){if(!reg)reg=await navigator.serviceWorker.register(new URL('sw.js',base),{updateViaCache:'none'});if(Date.now()-lastWorkerCheck>60000||force){lastWorkerCheck=Date.now();reg.update().catch(()=>{})}}
+ if('serviceWorker'in navigator&&location.protocol==='https:'){try{if(!reg)reg=await navigator.serviceWorker.register(new URL('sw.js',base),{updateViaCache:'none'});if(Date.now()-lastWorkerCheck>60000||force){lastWorkerCheck=Date.now();reg.update().catch(()=>{})}}catch{}}
  const checkURL=new URL('index.html',base);checkURL.searchParams.set('__uni_check',String(Date.now()));const resp=await fetch(checkURL,{cache:'no-store',credentials:'same-origin'});if(!resp.ok)throw Error('Rete non disponibile');const html=await resp.text();const match=html.match(/<meta\s+name=["']unistudio-build["']\s+content=["']([0-9.]+)["']\s*\/?>/i);
  if(!match)throw Error('Versione non riconosciuta');available=newer(match[1],current)?match[1]:'';note(available?'Nuova versione '+available+' disponibile.':'UniStudio è aggiornato ('+current+').');refreshNotice();apply();
  }catch{note('Controllo non disponibile. Riproverò quando la rete sarà attiva.')}finally{checking=false}
