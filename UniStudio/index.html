@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5fb">
-  <meta name="unistudio-build" content="15.1">
+  <meta name="unistudio-build" content="15.2">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="UniStudio">
@@ -132,6 +132,14 @@ html[data-x15-page=home] .topbar .a17-heading>.a17-symbol svg{width:20px;height:
 }
 @container (max-width:390px){#app .x151-grid{grid-template-columns:1fr;gap:10px}#app .x151-grid .x15-widget{grid-column:1/-1}#app .x151-section-title small{font-size:9px}}
 @supports not (container-type:inline-size){@media(max-width:1000px){#app .x151-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#app .x151-grid .x15-widget{grid-column:span 1}#app .x151-grid .x15-widget.x15-wide,#app .x151-grid.x151-default [data-x15-widget=exam]{grid-column:1/-1}#app .x151-hero{flex-direction:column;align-items:flex-start}}@media(max-width:480px){#app .x151-grid{grid-template-columns:1fr}#app .x151-grid .x15-widget{grid-column:1/-1}}}
+</style>
+<style id="home152-css">
+#app .x152-agenda{border-top:1px solid var(--x15-line);padding-top:9px;margin-top:7px}
+#app .x152-agenda strong{font-size:13px}
+#app .x152-agenda .x15-preview span{font-variant-numeric:tabular-nums;color:var(--muted);margin-right:5px}
+#app .x152-agenda .x15-link{border-bottom:0;padding-bottom:0}
+#app .x151-hero{margin-bottom:18px}
+#app .x151-grid .x15-widget{gap:2px}
 </style>
 </head>
 <body>
@@ -1611,7 +1619,10 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
   function widget(k){
     const m=mins(day()), due=state.tasks.filter(x=>!x.done), next=state.exams.filter(x=>x.date>=day()&&!x.grade).sort((a,b)=>a.date.localeCompare(b.date))[0];
     let body='';
-    if(k==='today')body='<div class="x15-big">'+m+'<small> min</small></div><p>Obiettivo: '+goal()+' min</p><progress aria-label="Obiettivo giornaliero" max="'+goal()+'" value="'+Math.min(m,goal())+'"></progress>'+go('focus','Inizia una sessione');
+    if(k==='today'){
+      const lessons=eventsOf(day()).filter(x=>x.kind==='lesson');
+      body='<div class="x15-big">'+m+'<small> min</small></div><p>Obiettivo: '+goal()+' min</p><progress aria-label="Obiettivo giornaliero" max="'+goal()+'" value="'+Math.min(m,goal())+'"></progress>'+go('focus','Inizia una sessione')+'<div class="x152-agenda"><strong>Lezioni di oggi</strong>'+(lessons.length?lessons.slice(0,3).map(x=>'<div class="x15-preview"><span>'+esc(x.time)+'</span> '+esc(x.title)+'</div>').join(''):'<p>Nessuna lezione in programma.</p>')+go('agenda','Apri agenda')+'</div>';
+    }
     if(k==='tasks')body='<div class="x15-big">'+due.length+'</div><p>Promemoria aperti · '+due.filter(x=>x.date&&x.date<=day()).length+' da fare entro oggi</p>'+due.slice(0,3).map(x=>'<div class="x15-preview">'+esc(x.title)+'</div>').join('')+go('tasks','Tutti i promemoria');
     if(k==='exam')body=next?'<div class="x15-big x15-exam">'+esc(next.title)+'</div><p>'+esc(next.date)+'</p>'+go('exams','Apri esami'):'<p>Nessun esame programmato.</p>'+go('exams','Organizza esami');
     if(k==='week'){const w=week(), max=Math.max(1,...w.map(x=>mins(x.date)));body='<div class="x15-big">'+w.reduce((a,x)=>a+mins(x.date),0)+'<small> min negli ultimi 7 giorni</small></div><div class="x15-chart">'+w.map(x=>'<div><span>'+mins(x.date)+'</span><div class="x15-track"><i style="height:'+Math.max(0,Math.min(100,mins(x.date)/max*100))+'%"></i></div><small>'+esc(x.label)+'</small></div>').join('')+'</div>'+go('journal9','Diario di studio')}
@@ -1619,8 +1630,8 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
     if(k==='recent')body=p.recent.some(x=>RENDERS[x])?'<div class="x15-links">'+p.recent.filter(x=>RENDERS[x]).map(x=>go(x)).join('')+'</div>':'<p>Gli strumenti che apri appariranno qui.</p>';
     return '<section class="x15-widget '+(p.wide.includes(k)?'x15-wide':'')+'" data-x15-widget="'+k+'"><div class="x15-widget-head"><span class="x15-symbol">'+icon(symbols[k])+'</span><h3>'+labels[k]+'</h3></div>'+body+'</section>';
   }
-  const previousHome=RENDERS.home;
-  RENDERS.home=()=>'<section class="x15-hero x151-hero"><div class="x151-welcome"><h2>'+esc(greeting())+'</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+' · Il tuo spazio di studio</p></div><div class="x15-hero-actions">'+button('spotlight','Cerca')+button('configure','Personalizza Home')+'</div></section><div class="x151-section-title"><h3>La tua giornata</h3><small>UNISTUDIO 15.1 · APPLE EXPERIENCE</small></div><div class="x15-grid x151-grid '+(p.order.join(',')===defs.order.join(',')&&p.wide.join(',')===defs.wide.join(',')&&!p.hidden.length?'x151-default':'')+'">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div><details class="x15-classic" '+(p.classic?'open':'')+'><summary>Altri strumenti e panoramica completa</summary>'+previousHome()+'</details>';
+  RENDERS.home=()=>'<section class="x15-hero x151-hero"><div class="x151-welcome"><h2>'+esc(greeting())+'</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+'</p></div><div class="x15-hero-actions">'+button('configure','Personalizza Home')+'</div></section><div class="x151-section-title"><h3>La tua giornata</h3><small>UNISTUDIO 15.2 · APPLE EXPERIENCE</small></div><div class="x15-grid x151-grid '+(p.order.join(',')===defs.order.join(',')&&p.wide.join(',')===defs.wide.join(',')&&!p.hidden.length?'x151-default':'')+'">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div>';
+  // Home now has one renderer; obsolete dashboard remains in source only for compatibility.
   function settings(){return '<section class="setting-card x15-settings"><div class="eyebrow">APPLE EXPERIENCE</div><h3>Aspetto e accessibilità</h3><p>Personalizza l’esperienza senza modificare i dati di studio.</p>'+[['motion','Animazioni'],['large','Testo più grande'],['contrast','Contrasto elevato'],['haptic','Feedback tattile (se supportato)']].map(([k,l])=>'<label><input type="checkbox" data-x15-pref="'+k+'" '+(p[k]?'checked':'')+'> '+l+'</label>').join('')+'<label>Superficie dei quaderni <select data-x15-pref="texture">'+[['paper','Carta delicata'],['clean','Bianca'],['warm','Carta avorio']].map(([k,l])=>'<option value="'+k+'" '+(p.texture===k?'selected':'')+'>'+l+'</option>').join('')+'</select></label>'+button('configure','Organizza widget Home')+'</section>'}
   const settings0=RENDERS.settings;RENDERS.settings=()=>settings()+settings0();
   const focus0=RENDERS.focus;RENDERS.focus=()=>'<div class="x15-focus-actions">'+button('immerse','Modalità immersiva')+'</div>'+focus0();
@@ -1628,10 +1639,10 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
   sync();
   const dialog=document.createElement('dialog');dialog.id='x15-dialog';dialog.setAttribute('aria-labelledby','x15-dialog-title');document.body.append(dialog);
   const top=document.querySelector('.header-right');
-  if(top){const b=document.createElement('button');b.type='button';b.className='x15-top-search';b.dataset.x15='spotlight';b.setAttribute('aria-label','Ricerca universale');b.title='Ricerca (⌘K)';b.innerHTML=icon('search');top.prepend(b)}
+  if(top){top.querySelector('.v9-top-search')?.remove();const b=document.createElement('button');b.type='button';b.className='x15-top-search';b.dataset.x15='spotlight';b.setAttribute('aria-label','Ricerca universale');b.title='Ricerca (⌘K)';b.innerHTML=icon('search');top.prepend(b)}
   let dialogMode='', lastFocus=null;
   function show(mode){dialogMode=mode;lastFocus=document.activeElement;if(!dialog.open)dialog.showModal();if(mode==='spotlight'){dialog.innerHTML='<div class="x15-modal-head"><h2 id="x15-dialog-title">Spotlight</h2>'+button('close','Chiudi')+'</div><label class="x15-searchbox">'+icon('search')+'<input id="x15-query" type="search" placeholder="Cerca appunti, mappe, strumenti…" aria-label="Cerca in UniStudio" autocomplete="off"></label><div id="x15-results" aria-live="polite"></div><footer>'+go('search4','Ricerca completa nei materiali')+'</footer>';results('');dialog.querySelector('input').focus()}else configure()}
-  function configure(){dialog.innerHTML='<div class="x15-modal-head"><h2 id="x15-dialog-title">Personalizza Home</h2>'+button('close','Fine')+'</div><p>Scegli quali widget vedere, la dimensione e il loro ordine.</p>'+p.order.map((k,i)=>'<div class="x15-config"><label><input type="checkbox" data-x15-visible="'+k+'" '+(!p.hidden.includes(k)?'checked':'')+'> '+labels[k]+'</label><div><button type="button" data-x15-size="'+k+'" aria-pressed="'+p.wide.includes(k)+'">'+(p.wide.includes(k)?'Grande':'Compatto')+'</button><button type="button" aria-label="Sposta '+labels[k]+' in alto" data-x15-move="'+k+'" data-dir="-1" '+(i===0?'disabled':'')+'>↑</button><button type="button" aria-label="Sposta '+labels[k]+' in basso" data-x15-move="'+k+'" data-dir="1" '+(i===p.order.length-1?'disabled':'')+'>↓</button></div></div>').join('')+'<label class="x15-config"><input type="checkbox" data-x15-pref="classic" '+(p.classic?'checked':'')+'> Apri anche la panoramica completa</label>'+button('reset','Ripristina widget')}
+  function configure(){dialog.innerHTML='<div class="x15-modal-head"><h2 id="x15-dialog-title">Personalizza Home</h2>'+button('close','Fine')+'</div><p>Scegli quali widget vedere, la dimensione e il loro ordine.</p>'+p.order.map((k,i)=>'<div class="x15-config"><label><input type="checkbox" data-x15-visible="'+k+'" '+(!p.hidden.includes(k)?'checked':'')+'> '+labels[k]+'</label><div><button type="button" data-x15-size="'+k+'" aria-pressed="'+p.wide.includes(k)+'">'+(p.wide.includes(k)?'Grande':'Compatto')+'</button><button type="button" aria-label="Sposta '+labels[k]+' in alto" data-x15-move="'+k+'" data-dir="-1" '+(i===0?'disabled':'')+'>↑</button><button type="button" aria-label="Sposta '+labels[k]+' in basso" data-x15-move="'+k+'" data-dir="1" '+(i===p.order.length-1?'disabled':'')+'>↓</button></div></div>').join('') +button('reset','Ripristina widget')}
   const normalize=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('it');
   const collections=[['notes','notes','Appunto'],['tasks','tasks','Promemoria'],['exams','exams','Esame'],['courses','lessons','Materia'],['notebooksV5','notebook5','Quaderno'],['mapsV10','maps10','Mappa']];
   function results(query){const q=normalize(query.trim()), out=dialog.querySelector('#x15-results');if(!out)return;
