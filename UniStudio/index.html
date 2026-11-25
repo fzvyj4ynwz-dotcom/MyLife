@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5fb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -264,13 +264,13 @@
       const data=JSON.parse(await file.text());
       if(!data||!Array.isArray(data.courses)||!Array.isArray(data.lessons)||!Array.isArray(data.tasks)||!Array.isArray(data.exams)||!Array.isArray(data.notes))throw Error('formato');
       if(!confirm('Importare il backup? I dati attuali verranno sostituiti.'))return;
-      state={...emptyState(),profileV2:data.profileV2&&typeof data.profileV2==='object'?data.profileV2:undefined,cardsV2:Array.isArray(data.cardsV2)?data.cardsV2:[],...Object.fromEntries(['courses','lessons','tasks','exams','notes','sessions'].map(k=>[k,Array.isArray(data[k])?data[k]:[]]))};
+      state={...emptyState(),profileV2:data.profileV2&&typeof data.profileV2==='object'?data.profileV2:undefined,cardsV2:Array.isArray(data.cardsV2)?data.cardsV2:[],plansV3:Array.isArray(data.plansV3)?data.plansV3:[],resourcesV3:Array.isArray(data.resourcesV3)?data.resourcesV3:[],...Object.fromEntries(['courses','lessons','tasks','exams','notes','sessions'].map(k=>[k,Array.isArray(data[k])?data[k]:[]]))};
       save();render();toast('Backup ripristinato');
     }catch{toast('Questo file non è un backup UniStudio valido.');}
   }
   async function showNotification(title,body){
     if(!('Notification' in window)||Notification.permission!=='granted')return;
-    try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification(title,{body,icon:'./icon-192.png',tag:title+body});}
+    try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.ready;await reg.showNotification(title,{body,icon:'./icon.svg',tag:title+body});}
     else new Notification(title,{body});}catch{try{new Notification(title,{body});}catch{}}
   }
   async function requestNotifications(){
@@ -406,6 +406,82 @@
   });
   document.addEventListener("click",e=>{const b=e.target.closest("[data-v2]");if(!b)return;const a=b.dataset.v2;if(a==="break")return beginMode(streak%4===0&&streak>0?"long":"rest");if(a==="continue")return beginMode("work");if(a==="dismiss"){if(focus.mode==="work")return beginMode("work");pending=false;pop.hidden=true;storeFocus();return;}const c=cards()[cardIndex];if(!c)return;if(a==="flip")answerVisible=!answerVisible;else if(a==="delete-card"){if(!confirm("Eliminare questa flashcard?"))return;state.cardsV2=cards().filter(x=>x.id!==c.id);answerVisible=false;save();}else{if(a==="known"||a==="again"){c.known=a==="known";save();}cardIndex=(cardIndex+1)%cards().length;answerVisible=false;}render();});
   if(pending)showPause();
+
+
+  // UNISTUDIO_V3
+  const extra=()=>({...{theme:"light",preset:"custom",avatar:"",wallPhoto:"",nickname:"",semester:"",bio:"",targetCfu:180,layout:"comfortable"},...(state.profileV2||{})});
+  const plans=()=>Array.isArray(state.plansV3)?state.plansV3:[];
+  const resources=()=>Array.isArray(state.resourcesV3)?state.resourcesV3:[];
+  const validImage=s=>typeof s==="string"&&/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s)&&s.length<450000?s:"";
+  const urlOK=s=>{try{const u=new URL(s);return ["https:","http:"].includes(u.protocol)?u.href:"";}catch{return ""}};
+  const presets={lavanda:["#785ce2","#f7f3fc"],rosa:["#a84670","#fff0f5"],salvia:["#357c68","#edf7f1"],oceano:["#326fa1","#eef5fc"],sabbia:["#94613c","#fbf4e9"],notte:["#a796ee","#171725"]};
+  const option=(value,label,selected)=>`<option value="${attr(value)}"${value===selected?" selected":""}>${esc(label)}</option>`;
+  const photo=(src,cls,alt)=>validImage(src)?`<img class="${cls}" src="${attr(src)}" alt="${alt}">`:"";
+  const style=document.createElement("style");
+  style.textContent=`.v3-profile-head{display:flex;align-items:center;gap:18px;margin:0 0 18px;flex-wrap:wrap}.v3-avatar{width:80px;height:80px;object-fit:cover;border-radius:26px;background:var(--accent);color:white;display:grid;place-items:center;font-size:30px;font-weight:700;flex-shrink:0}.v3-mini{width:32px;height:32px;border-radius:50%;object-fit:cover}.v3-list{display:grid;gap:10px;margin:14px 0}.v3-item{padding:13px;border:1px solid var(--border);border-radius:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;overflow-wrap:anywhere}.v3-item .grow{flex:1;min-width:120px}.v3-item p{margin:4px 0;font-size:12px}.v3-item a{color:var(--accent);overflow-wrap:anywhere}.v3-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;margin:12px 0}.v3-kpis div{border:1px solid var(--border);border-radius:13px;padding:12px}.v3-kpis strong{font-size:23px;display:block}.v3-compact .surface-pad,.v3-compact .setting-card{padding:15px!important}.v3-compact .nav-item{min-height:35px}.v3-profile-head h2{margin:0 0 5px}.v3-profile-head p{margin:0}.v3-theme-dark{color-scheme:dark;color:#f1eefb!important;--ink:#f1eefb;--muted:#bbb5ce;--card:#252538;--border:#414058}.v3-theme-dark .sidebar,.v3-theme-dark .surface,.v3-theme-dark .setting-card,.v3-theme-dark .stat-card,.v3-theme-dark .course-card,.v3-theme-dark .note-card,.v3-theme-dark .exam-card,.v3-theme-dark .task-card,.v3-theme-dark .list-card,.v3-theme-dark .bottom-nav,.v3-theme-dark dialog,.v3-theme-dark .more-links button{background:var(--card)!important;color:var(--ink)!important;border-color:var(--border)!important}.v3-theme-dark .sidebar-tip,.v3-theme-dark .plain-btn,.v3-theme-dark .light-btn,.v3-theme-dark .nav-item.active,.v3-theme-dark .bottom-nav .selected{background:#38334e!important;color:#e4ddff!important}.v3-theme-dark .nav-item,.v3-theme-dark .topbar-eyebrow,.v3-theme-dark .eyebrow{color:#d4cce6}.v3-theme-dark input,.v3-theme-dark textarea,.v3-theme-dark select{background:#201f30!important;color:var(--ink)!important;border-color:var(--border)!important}.v3-theme-dark .primary-btn{color:#171725!important}.sidebar{overflow-y:auto}.v3-wall .workspace{background-attachment:fixed;background-size:cover!important;background-position:center!important}.v3-wall .topbar>div:first-child{background:var(--card);padding:8px 14px;border-radius:14px}.v3-wall .section-heading h2{display:inline-block;background:var(--card);padding:4px 8px;border-radius:8px}.v3-profile-button{display:inline-flex;align-items:center;gap:7px}.v3-link{color:var(--accent)}@media(max-width:600px){.v3-profile-button{font-size:0;padding:8px;min-width:40px}.v3-profile-button span{font-size:18px}.v3-item .grow{min-width:100%}}`;
+  document.head.append(style);
+  const oldApply=applyProfile;
+  applyProfile=function(){
+    oldApply();
+    const p=extra(),root=document.documentElement,w=$(".workspace");
+    const dark=p.theme==="dark"||(p.theme==="auto"&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+    root.classList.toggle("v3-theme-dark",dark);root.classList.toggle("v3-compact",p.layout==="compact");
+    root.style.setProperty("--ink",dark?"#f1eefb":"#2a2540");root.style.setProperty("--muted",dark?"#bbb5ce":"#777185");root.style.setProperty("--card",dark?"#252538":"#fff");root.style.setProperty("--border",dark?"#414058":"#ebe8f2");
+    if(dark){root.style.setProperty("--bg","#171725");root.style.background="#171725";w.style.setProperty("background-color","#171725","important");}
+    const wall=validImage(p.wallPhoto);root.classList.toggle("v3-wall",!!wall);
+    if(wall)w.style.backgroundImage=`linear-gradient(${dark?"#171725bc,#171725dc":"#ffffff80,#ffffffbc"}),url("${wall}")`;
+    const h=$("#v3-header-profile");if(h){h.innerHTML=photo(p.avatar,"v3-mini","")||"<span>◎</span>";h.append(document.createTextNode(" Profilo"));}
+  };
+  $(".header-right").insertAdjacentHTML("afterbegin",'<button class="light-btn v3-profile-button" id="v3-header-profile" data-page="profile" aria-label="Apri profilo">◎ Profilo</button>');
+  const baseProfile=RENDERS.profile;
+  RENDERS.profile=()=>{
+    const p=extra(),name=p.nickname||p.name||"Il tuo profilo",initials=String(name).trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+    const avatar=photo(p.avatar,"v3-avatar","Foto profilo")||`<div class="v3-avatar">${esc(initials)}</div>`;
+    const field=(key,label,opts="")=>`<label>${label}<input name="${key}" value="${attr(p[key])}" ${opts}></label>`;
+    return `<div class="v2-stack"><section class="setting-card"><div class="v3-profile-head">${avatar}<div><div class="eyebrow">UNISTUDIO 3 · IL MIO SPAZIO</div><h2>${esc(name)}</h2><p>${esc([p.degree,p.university,p.year].filter(Boolean).join(" · ")||"Crea il tuo profilo universitario")}</p></div></div><div class="v2-form"><label>Foto profilo<input id="v3-avatar-upload" type="file" accept="image/*"></label><button class="plain-btn" data-v3="remove-avatar">Rimuovi foto</button></div><p>Foto e dati rimangono sul dispositivo.</p></section>${baseProfile()}<section class="setting-card"><h3>Identità e stile avanzato</h3><form class="v2-form" id="v3-style">${field("nickname","Come vuoi essere chiamata?","maxlength=50")}${field("semester","Semestre","maxlength=50")}${field("targetCfu","CFU per la laurea","type=number min=1 max=600 required")}<label>Modalità<select name="theme">${option("light","Chiara",p.theme)}${option("dark","Scura",p.theme)}${option("auto","Come iPad",p.theme)}</select></label><label>Tema preimpostato<select name="preset">${option("custom","Mantieni i miei colori","custom")}${Object.entries({lavanda:"Lavanda",rosa:"Rosa",salvia:"Salvia",oceano:"Oceano",sabbia:"Sabbia",notte:"Notte"}).map(([k,v])=>option(k,v,"custom")).join("")}</select></label><label>Densità interfaccia<select name="layout">${option("comfortable","Comoda",p.layout)}${option("compact","Compatta",p.layout)}</select></label><label class="v2-wide">Obiettivi personali<textarea name="bio" maxlength="1000" rows="3">${esc(p.bio)}</textarea></label><button class="primary-btn">Salva stile e identità</button></form><div class="v2-form" style="margin-top:18px"><label>Immagine di sfondo<input id="v3-wall-upload" type="file" accept="image/*"></label><button class="plain-btn" data-v3="remove-wall">Rimuovi immagine</button></div><p>Puoi scegliere una foto dalla libreria o mantenere i colori e motivi del profilo.</p></section></div>`;
+  };
+  const baseHero=hero;
+  hero=function(){const p=extra();return p.nickname?baseHero().replace(/(Buongiorno|Buon pomeriggio|Buonasera)(?:, [^<]*?)?!/,(_,g)=>g+", "+esc(p.nickname)+"!"):baseHero();};
+  let editingPlan="",editingResource="";
+  TITLES.planner="Piano di ripasso";
+  RENDERS.planner=()=>{
+    const a=plans().slice().sort((a,b)=>String(a.date).localeCompare(String(b.date))),e=a.find(x=>x.id===editingPlan)||{},day=today(),due=a.filter(x=>!x.done&&x.date<=day),finished=a.filter(x=>x.done),minutes=a.filter(x=>x.date===day&&!x.done).reduce((n,x)=>n+limit(x.minutes,1,720,30),0);
+    return `<div class="v2-stack"><section class="setting-card"><div class="eyebrow">ORGANIZZA IL RIPASSO</div><h2>Il tuo percorso, un passo alla volta</h2><div class="v3-kpis"><div><strong>${due.length}</strong>Da fare entro oggi</div><div><strong>${minutes} min</strong>Previsti oggi</div><div><strong>${finished.length}/${a.length}</strong>Completati</div></div><progress class="v2-progress" max="${Math.max(1,a.length)}" value="${finished.length}"></progress><div class="v3-list">${a.length?a.map(x=>`<article class="v3-item"><div class="grow"><strong>${x.done?"✓ ":""}${esc(x.topic)}</strong><p>${esc(courseName(x.courseId))} · ${esc(fmtDate(x.date))} · ${limit(x.minutes,1,720,30)} min${!x.done&&x.date<day?" · In ritardo":""}</p></div><button class="light-btn" data-v3="toggle-plan" data-id="${attr(x.id)}">${x.done?"Riapri":"Completato"}</button><button class="plain-btn" data-v3="edit-plan" data-id="${attr(x.id)}">Modifica</button><button class="danger-btn" data-v3="delete-plan" data-id="${attr(x.id)}">Elimina</button></article>`).join(""):"<p>Nessuna sessione pianificata.</p>"}</div></section><section class="setting-card"><h3>${e.id?"Modifica sessione":"Nuova sessione di ripasso"}</h3><form id="v3-plan" class="v2-form"><label class="v2-wide">Argomento<input name="topic" value="${attr(e.topic||"")}" maxlength="160" required></label><label>Materia<select name="courseId">${courseOptions(e.courseId||"",true)}</select></label><label>Data<input name="date" type="date" required value="${attr(e.date||day)}"></label><label>Minuti previsti<input name="minutes" type="number" min="1" max="720" required value="${limit(e.minutes||30,1,720,30)}"></label><button class="primary-btn">${e.id?"Salva modifica":"Pianifica"}</button>${e.id?'<button type="button" class="plain-btn" data-v3="cancel-plan">Annulla</button>':""}</form></section></div>`;
+  };
+  TITLES.resources="Risorse universitarie";
+  RENDERS.resources=()=>{
+    const a=resources(),e=a.find(x=>x.id===editingResource)||{};
+    return `<div class="v2-stack"><section class="setting-card"><div class="eyebrow">LA TUA BIBLIOTECA</div><h2>Link e materiale di studio</h2><p>Salva portale universitario, dispense online, libri, video e risorse per materia.</p><div class="v3-list">${a.length?a.map(x=>`<article class="v3-item"><div class="grow"><strong>${esc(x.title)}</strong><p>${esc(courseName(x.courseId))} · ${esc(x.kind)}</p>${urlOK(x.url)?`<a class="v3-link" href="${attr(urlOK(x.url))}" target="_blank" rel="noopener noreferrer">Apri risorsa ↗</a>`:""}<p>${esc(x.note||"")}</p></div><button class="plain-btn" data-v3="edit-resource" data-id="${attr(x.id)}">Modifica</button><button class="danger-btn" data-v3="delete-resource" data-id="${attr(x.id)}">Elimina</button></article>`).join(""):"<p>Non hai ancora aggiunto risorse.</p>"}</div></section><section class="setting-card"><h3>${e.id?"Modifica risorsa":"Aggiungi risorsa"}</h3><form id="v3-resource" class="v2-form"><label>Titolo<input name="title" required maxlength="150" value="${attr(e.title||"")}"></label><label>Categoria<select name="kind">${["Dispensa","Portale","Libro","Video","Altro"].map(k=>option(k,k,e.kind||"Dispensa")).join("")}</select></label><label>Materia<select name="courseId">${courseOptions(e.courseId||"",true)}</select></label><label>Indirizzo web (opzionale)<input name="url" type="url" maxlength="2000" placeholder="https://..." value="${attr(e.url||"")}"></label><label class="v2-wide">Note o riferimento<textarea name="note" maxlength="2000">${esc(e.note||"")}</textarea></label><button class="primary-btn">Salva risorsa</button>${e.id?'<button type="button" class="plain-btn" data-v3="cancel-resource">Annulla</button>':""}</form></section></div>`;
+  };
+  const baseMore=RENDERS.more;RENDERS.more=()=>baseMore()+`<div class="more-links" style="margin-top:12px"><button data-page="planner">Piano di ripasso <span>→</span></button><button data-page="resources">Risorse universitarie <span>→</span></button></div>`;
+  const baseHome=RENDERS.home;RENDERS.home=()=>{const p=extra(),a=plans().filter(x=>!x.done&&x.date<=today());return baseHome()+`<section class="surface surface-pad" style="margin-top:18px"><div class="eyebrow">IL TUO STUDIO</div><h3>${a.length} ripassi da fare entro oggi</h3>${p.bio?`<p>${esc(p.bio)}</p>`:""}<div class="v2-actions"><button class="primary-btn" data-page="planner">Piano di ripasso</button><button class="light-btn" data-page="resources">Le mie risorse</button></div></section>`};
+  $("#nav").insertAdjacentHTML("beforeend",'<button data-page="planner" class="nav-item"><span class="nav-ico">▥</span> Ripasso</button><button data-page="resources" class="nav-item"><span class="nav-ico">▧</span> Risorse</button>');
+  document.addEventListener("submit",e=>{
+    const id=e.target.id;if(!["v3-style","v3-plan","v3-resource"].includes(id))return;e.preventDefault();const f=Object.fromEntries(new FormData(e.target));
+    if(id==="v3-style"){const p={...prefs(),...extra(),...f,targetCfu:limit(f.targetCfu,1,600,180)};if(presets[f.preset]){[p.accent,p.background]=presets[f.preset];if(f.preset==="notte")p.theme="dark";}state.profileV2=p;}
+    if(id==="v3-plan"){if(!f.topic.trim()||!/^\d{4}-\d{2}-\d{2}$/.test(f.date))return;const a=plans(),old=a.find(x=>x.id===editingPlan);const x={id:old?.id||uid(),topic:f.topic.trim(),courseId:f.courseId,date:f.date,minutes:limit(f.minutes,1,720,30),done:old?.done||false};state.plansV3=old?a.map(y=>y.id===old.id?x:y):[...a,x];editingPlan="";}
+    if(id==="v3-resource"){if(!f.title.trim())return;if(f.url&&!urlOK(f.url)){toast("Usa un indirizzo http o https valido");return;}const a=resources(),old=a.find(x=>x.id===editingResource);const x={id:old?.id||uid(),title:f.title.trim(),kind:f.kind,courseId:f.courseId,url:f.url?urlOK(f.url):"",note:f.note};state.resourcesV3=old?a.map(y=>y.id===old.id?x:y):[...a,x];editingResource="";}
+    save();render();toast("Salvato");
+  });
+  document.addEventListener("click",e=>{
+    const b=e.target.closest("[data-v3]");if(!b)return;const k=b.dataset.v3,id=b.dataset.id;
+    if(k==="remove-avatar"||k==="remove-wall"){state.profileV2={...prefs(),[k==="remove-avatar"?"avatar":"wallPhoto"]:""};}
+    if(k==="edit-plan")editingPlan=id;if(k==="cancel-plan")editingPlan="";
+    if(k==="edit-resource")editingResource=id;if(k==="cancel-resource")editingResource="";
+    if(k==="toggle-plan")state.plansV3=plans().map(x=>x.id===id?{...x,done:!x.done}:x);
+    if(k==="delete-plan"){if(!confirm("Eliminare questo ripasso?"))return;state.plansV3=plans().filter(x=>x.id!==id);if(editingPlan===id)editingPlan="";}
+    if(k==="delete-resource"){if(!confirm("Eliminare questa risorsa?"))return;state.resourcesV3=resources().filter(x=>x.id!==id);if(editingResource===id)editingResource="";}
+    save();render();
+  });
+  document.addEventListener("change",async e=>{
+    if(!["v3-avatar-upload","v3-wall-upload"].includes(e.target.id))return;
+    const f=e.target.files?.[0],avatar=e.target.id==="v3-avatar-upload";if(!f)return;
+    if(f.size>20000000){toast("Scegli una foto inferiore a 20 MB");return;}
+    const u=URL.createObjectURL(f);
+    try{
+      const img=new Image();img.src=u;await img.decode();const max=avatar?320:900,ratio=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement("canvas");c.width=Math.max(1,Math.round(img.width*ratio));c.height=Math.max(1,Math.round(img.height*ratio));const ctx=c.getContext("2d");ctx.fillStyle="#ffffff";ctx.fillRect(0,0,c.width,c.height);ctx.drawImage(img,0,0,c.width,c.height);let data=c.toDataURL("image/jpeg",.75);if(!validImage(data))data=c.toDataURL("image/jpeg",.45);if(!validImage(data))throw Error("size");state.profileV2={...prefs(),[avatar?"avatar":"wallPhoto"]:data};save();render();toast("Immagine salvata");
+    }catch{toast("Immagine non supportata: prova JPG o PNG");}finally{URL.revokeObjectURL(u);}
+  });
 
   setInterval(focusTick,1000);
   setInterval(checkReminders,30000);
