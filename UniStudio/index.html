@@ -70,6 +70,7 @@
   function readDB12(db){return new Promise(resolve=>{if(!db)return resolve(null);let done=false;const finish=v=>{if(!done){done=true;clearTimeout(timer);resolve(v)}};const timer=setTimeout(()=>finish(null),3500);try{const req=db.transaction('state','readonly').objectStore('state').get('main');req.onsuccess=()=>finish(req.result||null);req.onerror=()=>finish(null)}catch{finish(null)}})}
   function storageStatus12(){const el=document.getElementById('u12-save-state');if(!el)return;el.textContent=saveError12?'⚠ '+saveError12:pending12?'Salvataggio in corso…':db12?'Archivio locale · '+(savedRevision12?'salvato':'pronto'):'Archivio locale · modalità compatibilità';el.dataset.warning=saveError12?'yes':'no';const n=document.getElementById('u5-status');if(n)n.textContent=el.textContent}
   function persistState12(){
+    if(Math.max(Number(readLocal12()?.paper12Revision)||0,marker12())>revision12){saveError12='Dati più recenti in un’altra scheda: chiudi questa scheda senza ulteriori modifiche';storageStatus12();throw Error('Stale tab')}
     const rev=Math.max(Date.now(),revision12+1);revision12=rev;state.paper12Revision=rev;
     let local=false;
     try{const str=JSON.stringify(state);if(str.length<=1800000||!db12){localStorage.setItem(KEY,str);local=true;lastLocal12=rev}}catch{}
@@ -79,7 +80,7 @@
       tx.objectStore('state').put({revision:rev,data:state},'main');
       pending12++;saveError12='';storageStatus12();
       tx.oncomplete=()=>{pending12--;savedRevision12=Math.max(savedRevision12,rev);mark12(savedRevision12);if(savedRevision12>=revision12)saveError12='';storageStatus12()};
-      tx.onabort=()=>{pending12--;if(rev>=revision12&&!local){saveError12='Ultima modifica NON salvata: esporta un backup prima di chiudere';toast(saveError12)}storageStatus12()};
+      tx.onabort=()=>{pending12--;if(rev>=revision12&&local){savedRevision12=Math.max(savedRevision12,rev)}if(rev>=revision12&&!local){saveError12='Ultima modifica NON salvata: esporta un backup prima di chiudere';toast(saveError12)}storageStatus12()};
       tx.onerror=()=>{};
     }catch(e){if(!local){saveError12='Ultima modifica NON salvata: esporta un backup';storageStatus12();throw e}savedRevision12=rev;storageStatus12()}
   }
@@ -99,7 +100,8 @@
   for(const key of ['courses','lessons','tasks','exams','notes','sessions'])if(!Array.isArray(state[key]))state[key]=[];
   revision12=Math.max(diskRev12,lastLocal12);
   savedRevision12=revision12;
-  if(db12&&previous12&&diskRev12<lastLocal12||db12&&previous12&&!stored12){try{persistState12()}catch{}}
+  if(db12&&previous12&&(diskRev12<lastLocal12||!stored12)){try{persistState12()}catch{}}
+  window.addEventListener('beforeunload',e=>{if(pending12||saveError12){e.preventDefault();e.returnValue=''}});
   window.addEventListener('storage',e=>{if((e.key===KEY||e.key===KEY+'_idb_revision12')&&Math.max(Number(readLocal12()?.paper12Revision)||0,marker12())>revision12){saveError12='Dati aggiornati in un’altra scheda: ricarica prima di modificare';storageStatus12()}});
   let page = 'home', weekOffset = 0, taskFilter = 'all', noteSearch = '';
   let focus = {mode:'work',left:25*60,running:false,endAt:0};
