@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f6f5fb">
-  <meta name="unistudio-build" content="15.2">
+  <meta name="unistudio-build" content="16.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="UniStudio">
@@ -179,6 +179,7 @@ html[data-x15-page=home] .topbar .a17-heading>.a17-symbol svg{width:20px;height:
   <dialog id="editor-dialog"><div class="dialog-inner"><header><div><div class="eyebrow">UNISTUDIO</div><h2 id="dialog-title">Nuovo elemento</h2></div><button class="icon-btn" id="close-dialog" type="button" aria-label="Chiudi">✕</button></header><form id="editor-form"></form></div></dialog>
   <input type="file" accept="application/json,.json" id="import-file" hidden>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="hybrid16.js"></script>
   <script>(async () => {
   'use strict';
   const KEY = 'unistudio_data_v1';
@@ -323,7 +324,7 @@ html[data-x15-page=home] .topbar .a17-heading>.a17-symbol svg{width:20px;height:
       <aside class="surface focus-tips"><div class="eyebrow">IL TUO PERCORSO</div><h3>Piccoli progressi</h3><div style="font-size:35px;font-weight:800;color:#745ad1">${doneToday}</div><p>Sessioni di concentrazione completate oggi.</p><div class="mini-table"><div><span>Minuti oggi</span><strong>${doneToday*25}</strong></div><div><span>Sessioni totali</span><strong>${state.sessions.length}</strong></div></div><h3 style="margin-top:28px">Il metodo Pomodoro</h3><ul><li>25 minuti su una sola attività.</li><li>5 minuti per staccare.</li><li>Ripeti con calma, al tuo ritmo.</li></ul><p>Il timer continua a contare se passi a un'altra schermata dell'app. Per un avviso a schermo bloccato, usa un timer nativo dell'iPad.</p></aside></div>`;
   }
   function renderSettings(){
-    return `<div class="settings-grid"><section class="setting-card"><div class="eyebrow">BACKUP E PRIVACY</div><h3>Metti al sicuro i tuoi dati</h3><p>Le informazioni vengono salvate soltanto in questo browser sull'iPad. Non c'è account e non avviene alcuna sincronizzazione automatica. Esporta regolarmente una copia e conservala su File o iCloud Drive.</p><div class="setting-actions"><button class="primary-btn" data-action="export-backup">↓ Esporta backup</button><button class="light-btn" data-action="import-backup">↑ Importa backup</button></div></section>
+    return `<div class="settings-grid"><section class="setting-card"><div class="eyebrow">BACKUP E PRIVACY</div><h3>Metti al sicuro i tuoi dati</h3><p>Le informazioni restano salvate in questo browser. La sincronizzazione cloud è facoltativa e richiede configurazione e accesso. Esporta regolarmente una copia e conservala su File o iCloud Drive.</p><div class="setting-actions"><button class="primary-btn" data-action="export-backup">↓ Esporta backup</button><button class="light-btn" data-action="import-backup">↑ Importa backup</button></div></section>
       <section class="setting-card"><div class="eyebrow">NOTIFICHE</div><h3>Non perdere gli impegni</h3><p>Puoi attivare avvisi mentre UniStudio è aperta. Per ricevere promemoria anche con l'app chiusa, esporta lezioni, esami e scadenze nel Calendario Apple e abilita lì gli avvisi.</p><div class="setting-actions"><button class="primary-btn" data-action="request-notification">${state.notifications?'✓ Avvisi richiesti':'Abilita avvisi'}</button><button class="light-btn" data-action="export-ics">↓ Esporta calendario</button></div></section>
       <section class="setting-card"><div class="eyebrow">INSTALLAZIONE IPAD</div><h3>Come aggiungere l'app alla Home</h3><div class="instructions">Apri il link di UniStudio in <strong>Safari</strong> sull'iPad.<ol><li>Tocca <strong>Condividi</strong> (quadrato con freccia in alto).</li><li>Seleziona <strong>Aggiungi alla schermata Home</strong>.</li><li>Tocca <strong>Aggiungi</strong>.</li></ol>Ora vedrai UniStudio sulla Home, come un'app. Non serve l'App Store.</div></section>
       <section class="setting-card"><div class="eyebrow">PROMEMORIA IMPORTANTI</div><h3>Come funzionano i dati</h3><p>La modalità offline si attiva dopo la prima visita tramite HTTPS. Se cancelli i dati di Safari, potresti perdere appunti e impegni: conserva un backup. L'esportazione del calendario copre le prossime 12 settimane di lezioni.</p><div class="setting-actions"><button class="danger-btn" data-action="clear-data">Cancella tutti i dati</button></div></section></div>`;
@@ -1630,7 +1631,7 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
     if(k==='recent')body=p.recent.some(x=>RENDERS[x])?'<div class="x15-links">'+p.recent.filter(x=>RENDERS[x]).map(x=>go(x)).join('')+'</div>':'<p>Gli strumenti che apri appariranno qui.</p>';
     return '<section class="x15-widget '+(p.wide.includes(k)?'x15-wide':'')+'" data-x15-widget="'+k+'"><div class="x15-widget-head"><span class="x15-symbol">'+icon(symbols[k])+'</span><h3>'+labels[k]+'</h3></div>'+body+'</section>';
   }
-  RENDERS.home=()=>'<section class="x15-hero x151-hero"><div class="x151-welcome"><h2>'+esc(greeting())+'</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+'</p></div><div class="x15-hero-actions">'+button('configure','Personalizza Home')+'</div></section><div class="x151-section-title"><h3>La tua giornata</h3><small>UNISTUDIO 15.2 · APPLE EXPERIENCE</small></div><div class="x15-grid x151-grid '+(p.order.join(',')===defs.order.join(',')&&p.wide.join(',')===defs.wide.join(',')&&!p.hidden.length?'x151-default':'')+'">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div>';
+  RENDERS.home=()=>'<section class="x15-hero x151-hero"><div class="x151-welcome"><h2>'+esc(greeting())+'</h2><p>'+esc(new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'}))+'</p></div><div class="x15-hero-actions">'+button('configure','Personalizza Home')+'</div></section><div class="x151-section-title"><h3>La tua giornata</h3><small>UNISTUDIO 16.0 · HYBRID CLOUD (ANTEPRIMA)</small></div><div class="x15-grid x151-grid '+(p.order.join(',')===defs.order.join(',')&&p.wide.join(',')===defs.wide.join(',')&&!p.hidden.length?'x151-default':'')+'">'+p.order.filter(k=>!p.hidden.includes(k)).map(widget).join('')+'</div>';
   // Home now has one renderer; obsolete dashboard remains in source only for compatibility.
   function settings(){return '<section class="setting-card x15-settings"><div class="eyebrow">APPLE EXPERIENCE</div><h3>Aspetto e accessibilità</h3><p>Personalizza l’esperienza senza modificare i dati di studio.</p>'+[['motion','Animazioni'],['large','Testo più grande'],['contrast','Contrasto elevato'],['haptic','Feedback tattile (se supportato)']].map(([k,l])=>'<label><input type="checkbox" data-x15-pref="'+k+'" '+(p[k]?'checked':'')+'> '+l+'</label>').join('')+'<label>Superficie dei quaderni <select data-x15-pref="texture">'+[['paper','Carta delicata'],['clean','Bianca'],['warm','Carta avorio']].map(([k,l])=>'<option value="'+k+'" '+(p.texture===k?'selected':'')+'>'+l+'</option>').join('')+'</select></label>'+button('configure','Organizza widget Home')+'</section>'}
   const settings0=RENDERS.settings;RENDERS.settings=()=>settings()+settings0();
@@ -1674,6 +1675,33 @@ const home=RENDERS.home;RENDERS.home=()=>'<section class="c13-card"><small>UNIST
     if(state.sessions.length>lastDone){const grip=document.getElementById('u14-mascot-grip');if(grip&&p.motion&&grip.animate&&!matchMedia('(prefers-reduced-motion: reduce)').matches)grip.animate([{transform:'scale(1)'},{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:500});const phrase=document.getElementById('u14-phrase');if(phrase)phrase.textContent='Sessione completata! Ogni piccolo passo conta.'}lastDone=state.sessions.length;
   };
 })();
+
+  // Hybrid 16: preserve original archive and save functions; cloud is explicitly opt-in.
+  if(globalThis.UniStudioHybrid16){
+    const hybrid=globalThis.UniStudioHybrid16.attach({
+      read:()=>state,
+      isSaved:()=>!pending12&&!saveError12&&savedRevision12>=revision12,
+      canApply:()=>['home','settings'].includes(page)&&!document.hidden&&!pending12&&!saveError12&&!focus.running&&!document.querySelector('dialog[open],#app input:focus,#app textarea:focus,#app [contenteditable]:focus'),
+      apply:async(payload,expected)=>{
+        const H=globalThis.UniStudioHybrid16;
+        if(!['home','settings'].includes(page)||document.hidden||pending12||saveError12||focus.running||document.querySelector('dialog[open],#app input:focus,#app textarea:focus,#app [contenteditable]:focus')||H.canonical(H.snapshot(state))!==H.canonical(expected)||!H.valid(payload))return false;
+        const old=state;
+        try{
+          state={...emptyState(),...JSON.parse(JSON.stringify(payload)),paper12Revision:revision12};
+          persistState12();
+        }catch(e){state=old;return false}
+        const wanted=revision12;
+        for(let i=0;i<50&&pending12;i++)await new Promise(r=>setTimeout(r,100));
+        if(pending12||saveError12||savedRevision12<wanted)return false;
+        try{render()}catch{}
+        return H.canonical(H.snapshot(state))===H.canonical(payload);
+      }
+    });
+    const home16=RENDERS.home,settings16=RENDERS.settings;
+    RENDERS.home=()=>home16().replace('<div class="x15-grid ',hybrid.home()+'<div class="x15-grid ');
+    RENDERS.settings=()=>hybrid.settings()+settings16();
+    const render16=render;render=function(){render16();hybrid.status()};
+  }
 
   setInterval(focusTick,1000);
   setInterval(checkReminders,30000);

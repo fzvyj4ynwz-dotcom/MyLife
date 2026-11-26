@@ -1,0 +1,34 @@
+name: UniStudio 16 vendor and validate
+on:
+  push:
+    branches: [unistudio-16-hybrid]
+    paths: ['.github/workflows/unistudio-16-vendor.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  vendor:
+    if: github.ref == 'refs/heads/unistudio-16-hybrid'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify code and install pinned SQLite assets
+        run: |
+          node UniStudio/hybrid16.test.cjs
+          tmp=$(mktemp -d)
+          cd "$tmp"
+          npm pack sql.js@1.13.0 --ignore-scripts
+          tar -xzf sql.js-1.13.0.tgz
+          mkdir -p "$GITHUB_WORKSPACE/UniStudio/vendor"
+          cp package/dist/sql-wasm.js package/dist/sql-wasm.wasm package/LICENSE "$GITHUB_WORKSPACE/UniStudio/vendor/"
+          cd "$GITHUB_WORKSPACE"
+          node -e "require('./UniStudio/vendor/sql-wasm.js')().then(SQL=>{const d=new SQL.Database();d.run('create table t(x);insert into t values(42)');const saved=d.export();d.close();const reopened=new SQL.Database(saved);if(reopened.exec('select x from t')[0].values[0][0]!==42)process.exit(1);reopened.close()}).catch(e=>{console.error(e);process.exit(1)})"
+      - name: Commit verified vendor assets to preview branch only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add UniStudio/vendor
+          git diff --cached --quiet || { git commit -m 'Vendor pinned SQLite WebAssembly for UniStudio 16'; git push origin HEAD:unistudio-16-hybrid; }
