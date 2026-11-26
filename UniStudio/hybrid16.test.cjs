@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const read=f=>fs.readFileSync(path.join(__dirname,f),'utf8');
+const scope={};const H=new Function('globalThis',read('hybrid16.js')+';return globalThis.UniStudioHybrid16;')(scope);
+const empty={courses:[],lessons:[],tasks:[],exams:[],notes:[],sessions:[]};
+assert(H.valid(empty));assert(!H.valid({courses:[]}));
+assert.equal(H.canonical({b:1,a:[2]}),H.canonical({a:[2],b:1}));
+assert.deepEqual(H.snapshot({...empty,paper12Revision:123}),empty);
+assert.equal(H.safeConfig('https://test.supabase.co','sb_publishable_test').url,'https://test.supabase.co');
+assert.throws(()=>H.safeConfig('https://test.supabase.co','sb_secret_test'));
+assert.throws(()=>H.safeConfig('https://example.com','sb_publishable_test'));
+new Function(read('sw.js'));
+for(const match of read('index.html').matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi))new Function(match[1]);
+console.log('Hybrid16 static and pure-function checks passed');
